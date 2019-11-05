@@ -1,7 +1,8 @@
-# Surface water modeling
+# Surface water modelling
 Water4Cities project
 
 ## Software requirements
-* [Anaconda](http://conda.io/docs/user-guide/install/index.html)
-* [gmaps](https://github.com/pbugnion/gmaps)
-* [asyncio](https://github.com/aio-libs/aiohttp)
+### Python Environment
+* [python 3.7 or higher (Anaconda)](http://conda.io/docs/user-guide/install/index.html)
+* [Jupyter Notebooks](https://jupyter.org/install.html)
+* Python packages (`numpy`, `pandas`, `matplotlib`, `scikit-learn`, `scikit-multiflow`, `gmaps`, `asyncio`)
