@@ -1,0 +1,17 @@
+# Code editors and IDEs
+.idea/
+.vscode/
+
+# Python and Jupyter
+.ipynb_checkpoints/
+__pycache__/
+
+# Generated project directories
+data/water/raw/
+data/weather/raw/
+resources/
+
+# Generated project files
+data/data.db
+data/water/data.json
+data/weather/data.json
