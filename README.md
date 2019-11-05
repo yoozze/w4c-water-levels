@@ -27,7 +27,7 @@ Start Jupyter notebook:
 ```
 jupyter notebook
 ```
-For google maps to work, you need to set your API key to `GOOGLE_API_KEY` environment variable:
+For google maps to work correctly, you need to set your google API key to `GOOGLE_API_KEY` environment variable:
 ```
 setx GOOGLE_API_KEY your_api_key
 ```
