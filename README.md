@@ -2,6 +2,17 @@
 Water4Cities project...
 
 ## Software requirements
+
+### Dockerized version
+
+```
+docker run -p 8888:8888 -v "$PWD":/home/jovyan jupyter/datascience-notebook
+# Check the right Docker instance id with "docker ps"
+docker exec b7f3abbf54da pip install ipywidgets scikit-multiflow gmaps asyncio aiohttp
+```
+
+
+### Installing on machine
 * [Anaconda (python 3.7 or higher)](http://conda.io/docs/user-guide/install/index.html)
 
 ## Installation
