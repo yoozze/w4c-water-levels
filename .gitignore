@@ -15,3 +15,8 @@ resources/
 data/data.db
 data/water/data.json
 data/weather/data.json
+
+.cache/
+.ipython/
+.local/
+venv/
