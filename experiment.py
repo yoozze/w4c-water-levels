@@ -45,6 +45,7 @@ import scipy.cluster.hierarchy as sch
 # Plotting
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from pandas.plotting import register_matplotlib_converters
 
 # Machine learning
 from sklearn.preprocessing import StandardScaler, MaxAbsScaler, MinMaxScaler, Normalizer
@@ -754,6 +755,7 @@ class GeneticSelector():
 
 # %%
 pd.set_option('display.max_rows', 5000)
+register_matplotlib_converters()
 
 # %% [markdown]
 # ## 1. Data preparation
