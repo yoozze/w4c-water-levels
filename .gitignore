@@ -9,14 +9,15 @@
 __pycache__/
 
 # Generated project directories
-data/water/raw/
-data/weather/raw/
-resources/
+scripts/data/water/raw/
+scripts/data/weather/raw/
+scripts/experiments/
+scripts/analysis/
 
 # Generated project files
-data/data.db
-data/water/data.json
-data/weather/data.json
+scripts/data/data.db
+scripts/data/water/data.json
+scripts/data/weather/data.json
 
 .cache/
 .ipython/

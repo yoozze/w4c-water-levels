@@ -14,13 +14,17 @@ import time
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
-from utils import (
+from lib.utils import (
     get_data_path,
     get_google_api_key,
     get_water_definitions,
+    load_settings,
     parse_date,
     save_json
 )
+
+
+SETTINGS = load_settings()
 
 
 def parse_cli_args():
@@ -33,7 +37,7 @@ def parse_cli_args():
 
     """
     parser = argparse.ArgumentParser(description='Download weather archive data from `https://darksky.net`.')
-    parser.add_argument('locations', type=str, nargs='+', default=[],
+    parser.add_argument('-l', '--locations', type=str, nargs='+', default=[],
                         help='Location name, list of location names or file path to locations JSON file.')
     parser.add_argument('-d', '--dates', type=str, nargs='+', default=[],
                         help='Date, date interval or list of dates, e.g. `2010-01-01` or `2010-01-01:2010-12-31`')
@@ -332,6 +336,9 @@ def extend_metadata(metadata, dir_name, location):
     for water_body in [d['body'] for d in water_defs.values()]:
         if water_body in location:
             ref = location[water_body]
+            if dir_name not in metadata:
+                metadata[dir_name] = {}
+
             if water_body not in metadata[dir_name]:
                 metadata[dir_name][water_body] = location if isinstance(ref, list) else [ref]
             else:
@@ -356,14 +363,23 @@ def crawl(args):
 
     """
     metadata = {}
-    locations = parse_locations(args.locations)
-    dates = parse_dates(args.dates)
+    
+    if len(args.locations) < 1:
+        locations = SETTINGS['weather_locations'] if SETTINGS else []
+    else:
+        locations = parse_locations(args.locations)
+
+    if len(args.dates) < 1:
+        dates = parse_dates(SETTINGS['weather_dates'] if SETTINGS else [])
+    else:
+        dates = parse_dates(args.dates)
+    
     dates_by_years = partition_dates(dates)
     loop = asyncio.get_event_loop()
 
     start_time = time.time()
     request_count = 0
-    for index, location in enumerate(locations):
+    for location in locations:
         # Initialize location directory.
         dir_name = f'{location["lat"]}-{location["lng"]}'
         location_dir = get_data_path('weather', 'raw', dir_name)
@@ -372,6 +388,7 @@ def crawl(args):
         # Skip locations that were already downloaded.
         if dir_exists:
             print(f'''Directory "{location_dir}" already exist. Skipping location "{location['name']}"!''')
+            print(metadata, dir_name, location)
             extend_metadata(metadata, dir_name, location)
             continue
 

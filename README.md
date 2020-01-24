@@ -48,6 +48,6 @@ Build database:
 ```
 cd data
 python get_water.py
-python get_weather.py weather_locations.json -d 2010-01-01:2017-12-31
+python get_weather.py
 python build_db.py
 ```

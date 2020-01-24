@@ -12,9 +12,10 @@ import re
 import time
 import urllib.parse
 import urllib.request
-from utils import (
+from lib.utils import (
     get_data_path,
     read_from_url,
+    load_settings,
     save_json
 )
 

@@ -1,7 +1,5 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
-# %%
-from IPython import get_ipython
 
 # %% [markdown]
 # # Modelling
@@ -11,13 +9,20 @@ from IPython import get_ipython
 # ### 0.1. Environment
 
 # %%
-import data.utils as utils
+from IPython import get_ipython
+ipython = get_ipython()
 
 # Initialize environment.
-get_ipython().run_line_magic('matplotlib', 'inline')
-# %matplotlib notebook
-get_ipython().run_line_magic('reload_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
+if ipython:
+    get_ipython().run_line_magic('matplotlib', 'inline')
+    # get_ipython().run_line_magic('matplotlib', 'notebook')
+    get_ipython().run_line_magic('reload_ext', 'autoreload')
+    get_ipython().run_line_magic('autoreload', '2')
+
+if ipython:
+    import scripts.lib.utils as utils
+else:
+    import lib.utils as utils
 
 utils.init_environment()
 
@@ -35,7 +40,14 @@ import itertools
 from IPython.display import display, HTML
 
 # Local libraries
-import data.query as dq
+if ipython:
+    import scripts.lib.query as dq
+    from scripts.lib.bagging import BaggingRegression
+    from scripts.lib.genetic_selector import GeneticSelector
+else:
+    import lib.query as dq
+    from lib.bagging import BaggingRegression
+    from lib.genetic_selector import GeneticSelector
 
 # Data manipulation
 import pandas as pd
@@ -50,7 +62,6 @@ from pandas.plotting import register_matplotlib_converters
 # Machine learning
 from sklearn.preprocessing import StandardScaler, MaxAbsScaler, MinMaxScaler, Normalizer
 from sklearn.model_selection import cross_val_score
-from sklearn.linear_model import LinearRegression
 
 from sklearn.linear_model import LinearRegression, LogisticRegression, Perceptron
 from sklearn.tree import DecisionTreeRegressor, ExtraTreeRegressor, DecisionTreeClassifier, ExtraTreeClassifier
@@ -67,9 +78,8 @@ from sklearn.metrics import mean_squared_error, r2_score, recall_score, precisio
 
 from skmultiflow.trees import RegressionHoeffdingTree, RegressionHAT, HoeffdingTree, HAT
 
-from lib.bagging import BaggingRegression
 from sklearn.model_selection import RandomizedSearchCV
-from lib.genetic_selector import GeneticSelector
+
 
 # %% [markdown]
 # ### 0.3. Settings
@@ -157,8 +167,8 @@ METHODS = {
                 'name': 'Random Forest Regressor',
                 'class': RandomForestRegressor,
                 'params': {
-                    'n_estimators':10,
-                    'random_state':random_seed
+                    'n_estimators': 10,
+                    'random_state': random_seed
                 },
                 'grid': {
                     'max_depth': [2, 3, 5, 7, None],
@@ -240,7 +250,14 @@ METHODS = {
                 'params': {
                     'leaf_prediction': 'perceptron',
                     'random_state': 0
-                }
+                },
+                'grid': {
+                    'leaf_prediction': ['nba', 'leaf', 'perceptron'],
+                    'grace_period': [10, 25, 50, 100, 200, 500],
+                    'binary_split': [True, False],
+                    'no_preprune': [True, False],
+                    'nb_threshold': [0, 1, 2, 3, 4, 5],
+                },
             },
             'RHAT': {
                 'name': 'Hoeffding Adaptive Tree Regressor',
@@ -249,6 +266,13 @@ METHODS = {
                     'leaf_prediction': 'perceptron',
                     'random_state': 0
                 },
+                'grid': {
+                    'leaf_prediction': ['nba', 'leaf', 'perceptron'],
+                    'grace_period': [10, 25, 50, 100, 200, 500],
+                    'binary_split': [True, False],
+                    'no_preprune': [True, False],
+                    'nb_threshold': [0, 1, 2, 3, 4, 5],
+                }
             },
             'BAGRHT': {
                 'name': 'Bagging (Hoeffding Tree) Regressor',
@@ -663,6 +687,15 @@ redundant_stations = [3280, 3350]
 stations = [s for s in stations if s not in redundant_stations]
 print(f'Selected {len(stations)} stations.')
 
+# stations_details = dq.get_sw_stations(stations)
+# stations_df = pd.DataFrame(stations_details, columns = ['Id', 'Name', 'Watercourse', 'Location', 'Latitude', 'Longitude'])
+# stations_df.drop('Name', 1, inplace=True)
+# stations_df.drop('Watercourse', 1, inplace=True)
+# # stations_df.drop('Location', 1, inplace=True)
+# stations_df.drop('Latitude', 1, inplace=True)
+# stations_df.drop('Longitude', 1, inplace=True)
+# stations_df.set_index('Id', inplace=True)
+# stations_df
 
 # %%
 # Additional filtering
@@ -696,7 +729,7 @@ plt.title(f'Water levels for station {station_sample} between {DATE_FROM[0:4]} a
 plt.xlabel('date')
 plt.ylabel('water level [cm]')
 plt.tight_layout()
-plt.show()
+# plt.show()
 
 # Plot water level histogram.
 plt.figure(figsize=(13, 7))
@@ -705,7 +738,7 @@ plt.title(f'Water levels histogram for station {station_sample} between {DATE_FR
 plt.xlabel('water level [cm]')
 plt.ylabel('count')
 plt.tight_layout()
-plt.show()
+# plt.show()
 
 # %% [markdown]
 # ### 1.2. Weather data
@@ -1212,7 +1245,7 @@ for station_id, dataset in datasets.items():
                         t = time.time()
                         
                         if(len(grid.keys())>0):
-                            gs = RandomizedSearchCV(estimator=m, param_distributions=grid, n_iter=1, cv=3, verbose=2, random_state=42, n_jobs=1)
+                            gs = RandomizedSearchCV(estimator=m, param_distributions=grid, n_iter=10, cv=3, verbose=2, random_state=42, n_jobs=1)
                             gs.fit(X_train, y_train)
                             m = method['class'](**gs.best_params_)
 
@@ -1245,7 +1278,7 @@ for station_id, dataset in datasets.items():
                             test_len = len(y_test_abs)
                             for i, abs_val in enumerate(y_test_abs):
                                 if i + h >= test_len:
-                                    break;
+                                    break
                                 y_predicted_abs_h[i + h] = abs_val + sum(y_predicted[i:i + h])
 
                             predicted_abs_h += y_predicted_abs_h

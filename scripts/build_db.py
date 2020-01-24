@@ -8,12 +8,16 @@ import sqlite3
 import numpy as np
 import pandas as pd
 from datetime import datetime
-from utils import (
+from lib.utils import (
     connect_to_db,
     get_data_path,
     get_water_definitions,
-    read_from_url
+    read_from_url,
+    load_settings
 )
+
+
+SETTINGS = load_settings()
 
 
 def load_metadata(data):
@@ -27,7 +31,7 @@ def load_metadata(data):
     Returns
     -------
     dict or None
-            Metadata dictionary if metadata file was found, `None` otherwise.
+        Metadata dictionary if metadata file was found, `None` otherwise.
 
     """
     file_path = get_data_path(data, 'data.json')
@@ -253,8 +257,7 @@ def populate_water_measurements(cursor, archive, directory, station):
         `True` if measurements table was successfully populated, `False` otherwise.
 
     """
-    csv_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
+    csv_path = get_data_path(
         'water',
         'raw',
         archive,
@@ -262,7 +265,7 @@ def populate_water_measurements(cursor, archive, directory, station):
         f'{station}.csv'
     )
 
-    with open(csv_path, 'r') as file:
+    with open(csv_path, 'r', encoding='utf-8') as file:
         reader = csv.reader(file, delimiter=';')
         header = next(reader)
         column_names_map = get_water_index_map(archive, header)
@@ -316,7 +319,7 @@ def get_station_data():
         Hydrological station data (ID, name, watercourse, lat, lng, ...)
 
     """
-    url = 'http://www.arso.gov.si/vode/podatki/arhiv/Spisek_postaj.xlsx'
+    url = SETTINGS['stations_data_url']
     path = get_data_path('water', 'stations.xlsx')
 
     if not os.path.exists(path):

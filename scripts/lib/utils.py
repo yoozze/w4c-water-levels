@@ -1,5 +1,6 @@
 """Utilities module"""
 
+import math
 import json
 import os
 import sqlite3
@@ -18,7 +19,8 @@ def init_environment():
 
     """
     # Append data directory to system path to alow local module imports.
-    sys.path.append(get_data_path())
+    sys.path.append(get_scripts_path())
+    sys.path.append(get_scripts_path('lib'))
 
     # FIX `Basemap` import error...
     # if 'PROJ_LIB' not in os.environ:
@@ -54,6 +56,28 @@ def get_google_api_key(verbose=True):
     return api_key
 
 
+def get_scripts_path(*args):
+    """Get file system path relative to scripts directory from given arguments.
+
+    Parameters
+    ----------
+    args : list[str]
+        List of subdirectory names.
+
+    Returns
+    -------
+    str
+        File system path generated from given list of subdirectories, relative to scripts directory, if `args` list is
+        not empty, path to scripts directory otherwise.
+
+    """
+    # Get absolute scripts directory relative to this library.
+    abs_file_dir = os.path.dirname(os.path.realpath(__file__))
+    abs_scripts_dir = os.path.realpath(os.path.join(abs_file_dir, '..'))
+
+    return os.path.realpath(os.path.join(abs_scripts_dir, *args))
+
+
 def get_data_path(*args):
     """Get file system path relative to data directory from given arguments.
 
@@ -69,7 +93,8 @@ def get_data_path(*args):
         not empty, path to data directory otherwise.
 
     """
-    return os.path.join(os.path.dirname(os.path.realpath(__file__)), *args)
+
+    return get_scripts_path('data', *args)
 
 
 def parse_date(date):
@@ -193,3 +218,64 @@ def save_json(data, file_path):
     with open(file_path, 'w') as file:
         json.dump(data, file)
 
+
+def load_settings():
+    """Load settings.
+
+    Returns
+    -------
+    dict or None
+        Settings dictionary if settings file was found, `None` otherwise.
+
+    """
+    file_path = get_scripts_path('settings.json')
+
+    if os.path.exists(file_path):
+        with open(file_path, 'r', encoding='utf-8') as json_file:
+            return json.load(json_file)
+    else:
+        print('Failed to load settings!')
+        return None
+
+
+def get_range(min, max):
+    """Get a range between `min` and `max` with predetermined step.
+
+    Parameters
+    ----------
+    min : int
+        Lower bound of a range.
+        
+    max : int
+        Upper bound of a range.
+
+    Returns
+    -------
+    list
+        Rane of integers between given bounds.
+    
+    """
+    r = range(min, max)
+    r = []
+    i = min
+    while i <= max:
+        r.append(i)
+        e = math.floor(math.log10(i))
+        d = 10 ** e
+        if i < 10 ** (e + 1) / 2:
+            d = math.ceil(d / 2)
+        i += d
+    return r
+
+
+def main():
+    print(get_scripts_path('..'))
+    print(get_scripts_path('.'))
+    print(get_data_path())
+    print(get_data_path('..', 'data', 'data.db'))
+    print(load_settings())
+    pass
+
+
+if __name__ == '__main__':
+    main()

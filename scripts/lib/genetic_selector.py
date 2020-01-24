@@ -1,3 +1,7 @@
+import random
+import numpy as np
+from sklearn.model_selection import cross_val_score
+
 class GeneticSelector():
     def __init__(self, estimator, n_gen, size, n_best, n_rand, 
                  n_children, mutation_rate):
