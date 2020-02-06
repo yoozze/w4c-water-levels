@@ -1,0 +1,72 @@
+[
+    {
+        "name": "Groundwater levels classification with GA selected features",
+        "description": "Modeling daily changes of groundwater levels",
+        "water_type": "ground",
+        "sensors": [
+            "85065", // Lj. - Flajšmanova (Fip-1/04)
+            "85012", // Roje (V-01)
+            "85064", // Lj-Bratislavska (Brp-1a/04)
+            "85030", // Kleče (0541)
+            // !"85054", // Bežigrad (B-01)
+        ],
+        "date_from": "2010-01-01",
+        "date_to": "2017-12-31",
+        "features": [
+            "sun_duration",
+            "cloud_cover_avg",
+            "precipitation",
+            "snow_accumulation",
+            "snow_depth",
+            "temperature_avg",
+            "temperature_min",
+            "temperature_max",
+        ],
+        "max_average": 20,
+        "max_shift": 20,
+        "ml_methods": {
+            // "reg": [
+            //     "LinearRegression",             // Linear Regression
+            //     "DecisionTreeRegressor",        // Decision Tree Regressor
+            //     "RandomForestRegressor",        // Random Forest Regressor
+            //     "GradientBoostingRegressor",    // Gradient Boosting Regressor
+            //     "PLSRegression",                // Partial Least Squares Regression
+            //     "ExtraTreeRegressor",           // Extremely Randomized Tree Regressor
+            //     "SVR",                          // Epsilon-Support Vector Regression
+            //     "MLPRegressor",                 // Multi-Layer Perceptron Regressor
+            //     "KNeighborsRegressor",          // k-Nearest Neighbors Regressor
+            //     "RegressionHoeffdingTree",      // Hoeffding Tree Regressor
+            //     "RegressionHAT",                // Hoeffding Adaptive Tree Regressor
+            //     // "BaggingRegressionHT",          // Hoeffding Tree Bagging Regressor
+            //     // "BaggingRegressionHAT",         // Hoeffding Adaptive Tree Bagging Regressor
+            // ],
+            "cls": [
+                "LogisticRegression",           // Logistic Regression
+                "DecisionTreeClassifier",       // Decision Tree Classifier
+                "ExtraTreeClassifier",          // Extremely Randomized Tree Classifier
+                "RandomForestClassifier",       // Random Forest Classifier
+                "SVC",                          // C-Support Vector Classification
+                "KNeighborsClassifier",         // k-Nearest Neighbors Classifier
+                "Perceptron",                   // Perceptron Classifier
+                "GaussianNB",                   // Gaussian Naïve Bayes Classifier
+                "HoeffdingTree",                // Hoeffding Tree Classifier
+                "HAT",                          // Hoeffding Adaptive Tree Classifier
+            ]
+        },
+        "eval_methods": {
+            "reg": [
+                "r2_score",
+                "root_mean_squared_error"
+            ],
+            "cls": [
+                "f1_score"
+            ]
+        },
+        "fs_method": "GeneticSelectionCV",
+        "hpo_method": "RandomizedSearchCV",
+        "cv_method": "TimeSeriesSplit",
+        "dis_method": "KBinsDiscretizer",
+        "horizon": [1, 2, 3, 4, 5],
+        "random_seed": 1234,
+    }
+]

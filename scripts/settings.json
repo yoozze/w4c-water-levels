@@ -284,5 +284,14 @@
             "lat": 45.483681, 
             "lng": 14.395569
         }
+    ],
+    "weather_locations_iot": [
+        {
+            "url": "http://atena.ijs.si:8080/CollectorAPIServer/weather?time_from=31/12/2009&time_to=01/01/2018&city=Ljubljana",
+            "aquifer": ["Ljubljansko polje"],
+            "name": "Ljubljana - Bežigrad",
+            "lat": 46.059499762,
+            "lng": 14.506497974
+        }
     ]
 }

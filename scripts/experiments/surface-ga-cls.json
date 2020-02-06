@@ -1,0 +1,153 @@
+[
+    {
+        "name": "Surface water levels classification with GA selected features",
+        "description": "Modeling daily changes of surface water levels",
+        "water_type": "surface",
+        "sensors": [
+            // !1060, // Gornja Radgona I (Mura)
+            // !1070, // Petanjci (Mura)
+            // !?1140, // Pristava I (Ščavnica)
+            // !?1260, // Čentiba (Ledava)
+            // !1335, // Središče (Ivanjševski potok)
+            // !1355, // Hodoš I (Velika Krka)
+            2250, // Otiški Vrh I (Meža)
+            // !2432, // Muta I (Bistrica)
+            2530, // Ruta (Radoljna)
+            2620, // Loče (Dravinja)
+            // !?2719, // Podlehnik I (Rogatnica)
+            // !?2830, // Ranca (Pesnica)
+            // !?2900, // Zamušani I (Pesnica)
+            // !?3080, // Blejski most (Sava Dolinka)
+            3200, // Sveti Janez (Sava Bohinjka)
+            3250, // Bodešče (Sava Bohinjka)
+            // !3320, // Bohinjska Bistrica (Bistrica)
+            3400, // Mlino I (Jezernica)
+            // !?3420, // Radovljica I (Sava)
+            // !?3530, // Medno (Sava)
+            // !?3570, // Šentjakob (Sava)
+            // !?3725, // Hrastnik (Sava)
+            // !?3850, // Čatež I (Sava)
+            // !?3900, // Jesenice na Dolenjskem (Sava)
+            4200, // Suha I (Sora)
+            4230, // Zminec (Poljanska Sora)
+            4270, // Železniki (Selška Sora)
+            4450, // Domžale (Mlinščica-Kanal)
+            4515, // Vir (Rača)
+            4520, // Podrečje (Rača)
+            4570, // Topole (Pšata)
+            4575, // Loka (Pšata)
+            // !?4626, // Zagorje II (Medija)
+            4650, // Žebnik (Sopota)
+            4770, // Sodna vas II (Mestinjščica)
+            // !4860, // Metlika (Kolpa)
+            5040, // Kamin (Ljubljanica)
+            5078, // Moste I (Ljubljanica)
+            5330, // Borovnica (Borovniščica)
+            5425, // Iška vas (Iška)
+            5500, // Dvor (Gradaščica)
+            // !?5880, // Hasberg (Unica)
+            // !?5910, // Malni (Malenščica)
+            6060, // Nazarje (Savinja)
+            6068, // Letuš I (Savinja)
+            6200, // Laško I (Savinja)
+            6220, // Luče (Lučnica)
+            6300, // Šoštanj (Paka)
+            6340, // Rečica (Paka)
+            6350, // Škale (Lepena)
+            6385, // Pesje IV (Lepena)
+            6400, // Škale (Sopota)
+            // !?6420, // Šoštanj (Velunja)
+            // !?6550, // Dolenja vas II (Bolska)
+            // !?6691, // Črnolica I (Voglajna)
+            // !?6835, // Vodiško I (Gračnica)
+            // !7488, // Prigorica I (Ribnica)
+            // !8080, // Kobarid I (Soča)
+            // !?8180, // Solkan I (Soča)
+            // !?8230, // Log pod Mangartom (Koritnica)
+            // !?8242, // Kal-Koritnica I (Koritnica)
+            // !?8270, // Žaga (Učja)
+            8454, // Cerkno III (Cerknica)
+            8565, // Dolenje (Vipava)
+            // !?8710, // Potoki (Nadiža)
+            // !9015, // Trpčane (Reka)
+            // !9030, // Trnovo (Reka)
+        ],
+        "date_from": "2010-01-01",
+        "date_to": "2017-12-31",
+        "features": [
+            "day_time",
+            "precipitation",
+            "snow_accumulation",
+            "temperature_avg",
+            "temperature_min",
+            "temperature_max",
+            "cloud_cover_avg",
+            "cloud_cover_min",
+            "cloud_cover_max",
+            "dew_point_avg", 
+            "dew_point_min", 
+            "dew_point_max",
+            "humidity_avg",
+            "humidity_min",
+            "humidity_max",
+            "pressure_avg", 
+            "pressure_min", 
+            "pressure_max",
+            // "uv_index_avg", 
+            // "uv_index_min", 
+            // "uv_index_max",
+            "precipitation_probability_avg",
+            "precipitation_probability_min",
+            "precipitation_probability_max",
+            "precipitation_intensity_avg",
+            "precipitation_intensity_min",
+            "precipitation_intensity_max"
+        ],
+        "max_average": 20,
+        "max_shift": 20,
+        "ml_methods": {
+            // "reg": [
+            //     "LinearRegression",             // Linear Regression
+            //     "DecisionTreeRegressor",        // Decision Tree Regressor
+            //     "RandomForestRegressor",        // Random Forest Regressor
+            //     "GradientBoostingRegressor",    // Gradient Boosting Regressor
+            //     "PLSRegression",                // Partial Least Squares Regression
+            //     "ExtraTreeRegressor",           // Extremely Randomized Tree Regressor
+            //     "SVR",                          // Epsilon-Support Vector Regression
+            //     "MLPRegressor",                 // Multi-Layer Perceptron Regressor
+            //     "KNeighborsRegressor",          // k-Nearest Neighbors Regressor
+            //     "RegressionHoeffdingTree",      // Hoeffding Tree Regressor
+            //     "RegressionHAT",                // Hoeffding Adaptive Tree Regressor
+            //     // "BaggingRegressionHT",          // Hoeffding Tree Bagging Regressor
+            //     // "BaggingRegressionHAT",         // Hoeffding Adaptive Tree Bagging Regressor
+            // ],
+            "cls": [
+                "LogisticRegression",           // Logistic Regression
+                "DecisionTreeClassifier",       // Decision Tree Classifier
+                "ExtraTreeClassifier",          // Extremely Randomized Tree Classifier
+                "RandomForestClassifier",       // Random Forest Classifier
+                "SVC",                          // C-Support Vector Classification
+                "KNeighborsClassifier",         // k-Nearest Neighbors Classifier
+                "Perceptron",                   // Perceptron Classifier
+                "GaussianNB",                   // Gaussian Naïve Bayes Classifier
+                "HoeffdingTree",                // Hoeffding Tree Classifier
+                "HAT",                          // Hoeffding Adaptive Tree Classifier
+            ]
+        },
+        "eval_methods": {
+            "reg": [
+                "r2_score",
+                "root_mean_squared_error"
+            ],
+            "cls": [
+                "f1_score"
+            ]
+        },
+        "fs_method": "GeneticSelectionCV",
+        "hpo_method": "RandomizedSearchCV",
+        "cv_method": "TimeSeriesSplit",
+        "dis_method": "KBinsDiscretizer",
+        "horizon": [1, 2, 3, 4, 5],
+        "random_seed": 1234,
+    }
+]

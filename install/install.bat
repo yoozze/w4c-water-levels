@@ -20,7 +20,7 @@ echo ******************************
 echo * Installing other packages: *
 echo ******************************
 echo.
-call pip install ipywidgets scikit-multiflow gmaps asyncio aiohttp
+call pip install ipywidgets numpy scikit-multiflow gmaps asyncio aiohttp deap
 
 echo.
 echo *****************************

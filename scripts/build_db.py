@@ -123,14 +123,16 @@ def create_tables(connection):
                       )''')
 
     # Weather
-    cursor.execute('DROP TABLE IF EXISTS weather')
+    # cursor.execute('DROP TABLE IF EXISTS weather')
     cursor.execute('''CREATE TABLE IF NOT EXISTS weather (
                           id integer PRIMARY KEY,
                           location_id integer NOT NULL,
                           time integer,
                           day_time integer,
+                          sun_duration real,
                           precipitation real,
                           snow_accumulation real,
+                          snow_depth real,
                           temperature_avg real,
                           temperature_min real,
                           temperature_max real,
@@ -157,6 +159,22 @@ def create_tables(connection):
                           precipitation_intensity_max real,
                           FOREIGN KEY (location_id) REFERENCES locations(id)
                       )''')
+
+    # ARSO Weather
+    # cursor.execute('DROP TABLE IF EXISTS weather_arso')
+    # cursor.execute('''CREATE TABLE IF NOT EXISTS weather_arso (
+    #                       id integer PRIMARY KEY,
+    #                       location_id integer NOT NULL,
+    #                       temperature_max real,
+    #                       temperature_avg real,
+    #                       temperature_min real,
+    #                       sun_duration real,
+    #                       cloud_cover real,
+    #                       percipitation real,
+    #                       snow_blanket real,
+    #                       new_snow_blanket real,
+    #                       FOREIGN KEY (location_id) REFERENCES locations(id)
+    #                   )''')
 
 
 def get_water_index_map(archive, header):
@@ -193,6 +211,8 @@ def get_water_index_map(archive, header):
     for i, column in enumerate(header):
         for column_name in column_re[archive].keys():
             if re.search(column_re[archive][column_name], column, re.IGNORECASE):
+                if column_map[column_name] != -1:
+                    continue
                 column_map[column_name] = i
                 empty = False
 
@@ -326,7 +346,7 @@ def get_station_data():
         dir_path = os.path.dirname(path)
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
-        with open(path, 'wb') as file:
+        with open(path, 'wb', encoding="utf-8") as file:
             file.write(read_from_url(url, decode=False))
 
     df = pd.read_excel(path, sheet_name='VSE_VP')
@@ -515,6 +535,7 @@ def populate_weather(connection):
 
     print('WEATHER:')
 
+    # Darksky data
     for dir_name, location in metadata.items():
         print(f'\tPopulating weather: "{location["name"]}".')
 
@@ -606,7 +627,62 @@ def populate_weather(connection):
                             daily_forecast[f'{value_name}_max'] = 'NULL'
 
                     cursor.execute(f'''INSERT INTO weather({', '.join(daily_forecast.keys())})
-                                       VALUES ({', '.join(map(lambda v: str(v), daily_forecast.values()))})''')
+                                       VALUES ({', '.join([str(v) for v in daily_forecast.values()])})''')
+
+    # IOT data:
+    for location in SETTINGS['weather_locations_iot']:
+        print(f'\tPopulating weather: "{location["name"]}".')
+
+        # Insert location.
+        cursor.execute(f'''INSERT INTO locations(name, lat, lng)
+                           VALUES ('{location['name']}', {location['lat']}, {location['lng']})''')
+        location_id = cursor.lastrowid
+
+        # Set weather locations for watercourses/aquifers.
+        for water_body in [d['body'] for d in water_defs.values()]:
+            if water_body in location:
+                cursor.execute(f'''UPDATE {water_body}s
+                                   SET location_id = {location_id}
+                                   WHERE name IN ('{"', '".join(location[water_body])}')''')
+
+                # Set locations for all stations on given water body to match its location.
+                cursor.execute(f'''SELECT id
+                                   FROM {water_body}s
+                                   WHERE location_id = {location_id}''')
+                ids = [row[0] for row in cursor.fetchall()]
+                if len(ids):
+                    cursor.execute(f'''UPDATE {water_body}_stations
+                                       SET location_id = {location_id}
+                                       WHERE {water_body}_id IN ({', '.join([str(v) for v in ids])})''')
+
+                break        
+        
+        file_name = f'''{location['lat']}-{location['lng']}.json'''
+        json_path = get_data_path('weather', 'raw', file_name)
+
+        # If data file doesn't exist, download it first.
+        if not os.path.isfile(json_path):
+            with open(json_path, 'wb', encoding="utf-8") as file:
+                file.write(read_from_url(location['url'], decode=False))
+        
+        with open(json_path, 'r', encoding='utf-8') as json_file:
+            row_names = {
+                "Sun_duration": "sun_duration",
+                "CloudCover": "cloud_cover_avg",
+                "Percipitation": "precipitation",
+                "New_snow_blanket": "snow_accumulation",
+                "Snow_blanket": "snow_depth",
+                "TemperatureAvg": "temperature_avg",
+                "TemperatureMin": "temperature_min",
+                "TemperatureMax": "temperature_max"
+            }
+            forecasts = json.load(json_file)
+            for forecast in forecasts:
+                f = {row_names[k]: forecast[k] for k in row_names.keys()}
+                f['location_id'] = location_id
+                f['time'] = round(forecast['LastUpdatedEpoch'] / 1000)
+                cursor.execute(f'''INSERT INTO weather({', '.join(f.keys())})
+                                   VALUES ({', '.join([str(v) for v in f.values()])})''')
 
 
 def create_databases():
@@ -624,6 +700,7 @@ def create_databases():
 
     # Populate water tables.
     populate_water_tables(db_connection)
+
     # station_data = get_station_data()
     # station = station_data.query('ŠIFRA == 30301')
     # print(station)

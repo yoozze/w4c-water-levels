@@ -1,10 +1,13 @@
 """Simple logging module"""
 
 import io
+import sys
 from datetime import datetime
 
 
 class Log():
+    stdout = sys.stdout
+    stderr = sys.stderr
     session = 'default'
     cache = {
         session: io.StringIO()
@@ -28,6 +31,14 @@ class Log():
         Log.session = session
         if not Log.session in Log.cache:
             Log.cache[Log.session] = io.StringIO()
+        sys.stdout = Log.cache[Log.session]
+        sys.stderr = Log.cache[Log.session]
+
+
+    @staticmethod
+    def reset():
+        sys.stdout = Log.stdout
+        sys.stderr = Log.stderr
 
 
     @staticmethod
@@ -101,7 +112,7 @@ class Log():
         None
 
         """
-        with open(file_path, 'w') as file:
+        with open(file_path, 'w', encoding="utf-8") as file:
             file.write(Log.get(session))
 
 
@@ -115,9 +126,7 @@ class Log():
 
         """
         # Save `file` keyword argument.
-        file = None
-        if 'file' in kwargs:
-            file = kwargs['file']
+        file = kwargs.get('file')
 
         # Print to session buffer.
         kwargs['file'] = Log.cache[Log.session]
@@ -130,7 +139,11 @@ class Log():
             del kwargs['file']
 
         # Print to stdout.
+        sys.stdout = Log.stdout
+        sys.stderr = Log.stderr
         print(*args, **kwargs)
+        sys.stdout = Log.cache[Log.session]
+        sys.stderr = Log.cache[Log.session]
 
 
     @staticmethod

@@ -11,11 +11,11 @@ __pycache__/
 # Generated project directories
 scripts/data/water/raw/
 scripts/data/weather/raw/
-scripts/experiments/
+scripts/experiments/*/
 scripts/analysis/
 
 # Generated project files
-scripts/data/data.db
+scripts/data/*.db
 scripts/data/water/data.json
 scripts/data/weather/data.json
 
@@ -23,3 +23,4 @@ scripts/data/weather/data.json
 .ipython/
 .local/
 venv/
+scripts/analyse.py

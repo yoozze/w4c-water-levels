@@ -1,4 +1,4 @@
-# Global
+# Common
 import pandas as pd
 from sklearn.preprocessing import KBinsDiscretizer
 
@@ -13,6 +13,10 @@ from .query import (
 from .utils import (
     get_range
 )
+from .config import (
+    call
+)
+
 
 class Data():
     def __init__(self, config):
@@ -21,9 +25,10 @@ class Data():
         self.data = None
         
         # Initialize discretization method.
-        disc_method = self.config.get('disc_method')
-        disc_params = disc_method.get('params', {})
-        self.discretizer = disc_method['class'](**disc_params)
+        dis_method = self.config.get('dis_method')
+        dis_params = dis_method.get('params', {})
+        self.discretizer = call(dis_method['name'], dis_params)
+
 
     def get_sensors(self):
         if not self.sensors:
@@ -161,12 +166,12 @@ class Data():
     #     for sensor_id, dataset in self.datasets.items():
     #         file_path = os.path.join(data_dir, f'{sensor_id}.csv')
     #         log.info(f'Saving data: {file_path}')
-    #         with open(file_path, 'w') as file:
+    #         with open(file_path, 'w', encoding="utf-8") as file:
     #             ds = dataset if not columns else dataset.loc(axis=1)[columns]
     #             ds.to_csv(file, index_label='date', sep=',', line_terminator='\n')
 
 
-    def get(self, sensor, columns=None, column_filter=None, ml_type='reg'):
+    def get(self, sensor, columns=None, column_filter=None, ml_type='reg', raw=False):
         if not self.data or self.data['id'] != sensor:
             # Query data.
             data = self.query(sensor)
@@ -179,40 +184,42 @@ class Data():
                 'id': sensor
             }
             water_df, weather_df = data
+            water_df.rename(columns={ 'altitude': 'level' }, inplace=True)
         
-            if 'missing_values' not in self.sensors[sensor]:
-                self.sensors[sensor]['missing_values'] = [
-                    water_df.isna().sum().sum(),
-                    weather_df.isna().sum().sum()
-                ]
-
             # Fuse datasources.
             dataset = self.fuse(water_df, weather_df)
 
-            # Imputate data if neccessary.
-            self.imputate(dataset)
-            
             # Cache raw data
             self.data['raw'] = dataset
 
+            # Check for missinga values.
+            if 'missing_values' not in self.sensors[sensor]:
+                self.sensors[sensor]['missing_values'] = { f: int(dataset[f].isna().sum()) for f in dataset.columns }
+
         dataset = self.data['raw'].copy()
-        cache_key = f'processed.{ml_type}'
 
-        if cache_key not in self.data:
-            # Prepare data for classification.
-            if ml_type == 'cls':
-                self.discretize(dataset)
-        
-            # Construct features.
-            dataset = self.construct_features(dataset)
-            missing_values = dataset.isna().sum().sum()
-            if missing_values:
-                log.warning(f'Missing values after feature construction: {missing_values}')
+        if not raw:
+            cache_key = f'processed.{ml_type}'
 
-            # Cache processed data.
-            self.data[cache_key] = dataset
+            if cache_key not in self.data:
+                # Imputate data if neccessary.
+                self.imputate(dataset)
 
-        dataset = self.data[cache_key]
+                # Prepare data for classification.
+                if ml_type == 'cls':
+                    self.discretize(dataset)
+                    self.sensors[sensor]['bins'] = list(self.discretizer.bin_edges_[0])
+            
+                # Construct features.
+                dataset = self.construct_features(dataset)
+                missing_values = dataset.isna().sum().sum()
+                if missing_values:
+                    log.warning(f'Missing values after feature construction: {missing_values}')
+
+                # Cache processed data.
+                self.data[cache_key] = dataset
+
+            dataset = self.data[cache_key]
 
         # Filter columns if filter function is provided.
         if callable(column_filter):

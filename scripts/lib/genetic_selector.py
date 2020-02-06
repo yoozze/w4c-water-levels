@@ -4,7 +4,7 @@ from sklearn.model_selection import cross_val_score
 
 class GeneticSelector():
     def __init__(self, estimator, n_gen, size, n_best, n_rand, 
-                 n_children, mutation_rate):
+                 n_children, mutation_rate, max_features):
         # Estimator 
         self.estimator = estimator
         # Number of generations
@@ -19,26 +19,37 @@ class GeneticSelector():
         self.n_children = n_children
         # Probablity of chromosome mutation
         self.mutation_rate = mutation_rate
+        # Maximum number of features
+        self.max_features = max_features
         
         if int((self.n_best + self.n_rand) / 2) * self.n_children != self.size:
             raise ValueError("The population size is not stable.")  
             
     def initilize(self):
         population = []
+        gene_probability = 0.5 if not self.max_features else min(0.5, 0.9 * float(self.max_features) / float(self.n_features))
+        print('gene_probability', gene_probability)
         for i in range(self.size):
-            chromosome = np.ones(self.n_features, dtype=np.bool)
-            mask = np.random.rand(len(chromosome)) < 0.3
-            chromosome[mask] = False
+            chromosome = np.zeros(self.n_features, dtype=np.bool)
+            mask = np.random.rand(self.n_features) < gene_probability
+            chromosome[mask] = True
+            # chromosome = np.random.rand(self.n_features) < 0.5
             population.append(chromosome)
+            print('active genes:', sum(chromosome))
         return population
 
     def fitness(self, population):
         X, y = self.dataset
         scores = []
         for chromosome in population:
-            score = -1.0 * np.mean(cross_val_score(self.estimator, X[:,chromosome], y, 
+            if sum(chromosome) > self.max_features:
+                print('Max features exceeded: ', sum(chromosome))
+                score = -10000
+            else:
+                score = -1.0 * np.mean(cross_val_score(self.estimator, X[:,chromosome], y, 
                                                        cv=5, 
                                                        scoring="neg_mean_absolute_error"))
+            print('score', score)
             scores.append(score)
         scores, population = np.array(scores), np.array(population) 
         inds = np.argsort(scores)

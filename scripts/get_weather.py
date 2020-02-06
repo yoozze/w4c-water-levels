@@ -285,7 +285,7 @@ def save_forecast(forecasts, file_dir, file_name):
     if not os.path.exists(file_dir):
         os.makedirs(file_dir)
 
-    with open(os.path.join(file_dir, f'{file_name}.json'), 'w') as file:
+    with open(os.path.join(file_dir, f'{file_name}.json'), 'w', encoding="utf-8") as file:
         json.dump(forecasts, file)
 
 
