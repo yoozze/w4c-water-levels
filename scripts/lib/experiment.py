@@ -445,6 +445,8 @@ class Experiment():
                                 # Convert discrete values (classes) back to real values.
                                 y_pred_reg = self.data.undiscretize_array(y_pred)
                                 y_test_reg = self.data.undiscretize_array(y_test)
+                                cv_results['modelling']['y_pred_reg'] = y_pred_reg.tolist()
+                                cv_results['modelling']['y_test_reg'] = y_test_reg.tolist()
 
                                 for eval_method in eval_methods['reg']:
                                     eval_params = eval_method.get('params', {})
@@ -461,7 +463,9 @@ class Experiment():
                                     else:
                                         for k1, v1 in v['evaluation'].items():
                                             avg[k1] += float(v1) / float(cv_k)
+                            
                                 log.info('Cross-validation average:', ', '.join([f'{t[0]} = {t[1]}' for t in avg.items()]))
+                                log.info('Feature importances:', ml_model.feature_importances_)
 
 
         # end loop
