@@ -6,7 +6,7 @@
         "sensors": [
             "85065", // Lj. - Flajšmanova (Fip-1/04)
             // "85012", // Roje (V-01)
-            "85064", // Lj-Bratislavska (Brp-1a/04)
+            // "85064", // Lj-Bratislavska (Brp-1a/04)
             // "85030", // Kleče (0541)
             // !"85054", // Bežigrad (B-01)
         ],
@@ -26,7 +26,7 @@
         "max_shift": 20,
         "ml_methods": {
             "reg": [
-                "LinearRegression",             // Linear Regression
+                // "LinearRegression",             // Linear Regression
                 // "DecisionTreeRegressor",        // Decision Tree Regressor
                 // "RandomForestRegressor",        // Random Forest Regressor
                 "GradientBoostingRegressor",    // Gradient Boosting Regressor
@@ -64,18 +64,18 @@
                 //     },
                 // }
             ],
-            "cls": [
-                "LogisticRegression",           // Logistic Regression
-                // "DecisionTreeClassifier",       // Decision Tree Classifier
-                // "ExtraTreeClassifier",          // Extremely Randomized Tree Classifier
-                "RandomForestClassifier",       // Random Forest Classifier
-                // "SVC",                          // C-Support Vector Classification
-                // "KNeighborsClassifier",         // k-Nearest Neighbors Classifier
-                // "Perceptron",                   // Perceptron Classifier
-                // "GaussianNB",                   // Gaussian Naïve Bayes Classifier
-                // "HoeffdingTree",                // Hoeffding Tree Classifier
-                // "HAT",                          // Hoeffding Adaptive Tree Classifier
-            ]
+            // "cls": [
+            //     "LogisticRegression",           // Logistic Regression
+            //     "DecisionTreeClassifier",       // Decision Tree Classifier
+            //     "ExtraTreeClassifier",          // Extremely Randomized Tree Classifier
+            //     "RandomForestClassifier",       // Random Forest Classifier
+            //     "SVC",                          // C-Support Vector Classification
+            //     "KNeighborsClassifier",         // k-Nearest Neighbors Classifier
+            //     "Perceptron",                   // Perceptron Classifier
+            //     "GaussianNB",                   // Gaussian Naïve Bayes Classifier
+            //     "HoeffdingTree",                // Hoeffding Tree Classifier
+            //     "HAT",                          // Hoeffding Adaptive Tree Classifier
+            // ]
         },
         "eval_methods": {
             "reg": [
@@ -113,7 +113,7 @@
         "cv_method": "TimeSeriesSplit",
         "dis_method": "KBinsDiscretizer",
         // "horizon": [1, 2, 3, 4, 5],
-        "horizon": [1, 2, 3],
+        "horizon": [3],
         "random_seed": 1234,
     }
 ]

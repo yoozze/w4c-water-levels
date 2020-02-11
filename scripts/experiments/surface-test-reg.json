@@ -10,7 +10,7 @@
             // // !?1260, // Čentiba (Ledava)
             // // !1335, // Središče (Ivanjševski potok)
             // // !1355, // Hodoš I (Velika Krka)
-            2250, // Otiški Vrh I (Meža)
+            // 2250, // Otiški Vrh I (Meža)
             // // !2432, // Muta I (Bistrica)
             // 2530, // Ruta (Radoljna)
             // 2620, // Loče (Dravinja)
@@ -41,7 +41,7 @@
             // 4770, // Sodna vas II (Mestinjščica)
             // // !4860, // Metlika (Kolpa)
             // 5040, // Kamin (Ljubljanica)
-            // 5078, // Moste I (Ljubljanica)
+            5078, // Moste I (Ljubljanica)
             // 5330, // Borovnica (Borovniščica)
             // 5425, // Iška vas (Iška)
             // 5500, // Dvor (Gradaščica)
@@ -110,14 +110,14 @@
                 // "LinearRegression",             // Linear Regression
                 // "DecisionTreeRegressor",        // Decision Tree Regressor
                 // "RandomForestRegressor",        // Random Forest Regressor
-                // "GradientBoostingRegressor",    // Gradient Boosting Regressor
+                "GradientBoostingRegressor",    // Gradient Boosting Regressor
                 // "PLSRegression",                // Partial Least Squares Regression
                 // "ExtraTreeRegressor",           // Extremely Randomized Tree Regressor
                 // "SVR",                          // Epsilon-Support Vector Regression
                 // "MLPRegressor",                 // Multi-Layer Perceptron Regressor
                 // "KNeighborsRegressor",          // k-Nearest Neighbors Regressor
-                "RegressionHoeffdingTree",      // Hoeffding Tree Regressor
-                "RegressionHAT",                // Hoeffding Adaptive Tree Regressor
+                // "RegressionHoeffdingTree",      // Hoeffding Tree Regressor
+                // "RegressionHAT",                // Hoeffding Adaptive Tree Regressor
                 // {
                 //     "name": "BaggingRegression",
                 //     "description": "Hoeffding Tree Bagging Regressor",
