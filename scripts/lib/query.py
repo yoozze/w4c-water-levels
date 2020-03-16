@@ -198,7 +198,7 @@ def get_weather_data(archive, station, from_date=None, to_date=None, columns=Non
         to_time = int(parse_date(to_date).replace(tzinfo=timezone.utc).timestamp()) + 24 * 60 * 60
         date_query += f' AND w.time <= \'{to_time}\''
     
-    df = pd.read_sql_query(f'''SELECT {', '.join(map(lambda col: f'w.{col}', ['time', *columns])) if len(columns) else 'w.*'}
+    df = pd.read_sql_query(f'''SELECT {', '.join(map(lambda col: f'w.{col}', ['time', *columns])) if columns and len(columns) else 'w.*'}
                                FROM weather w
                                INNER JOIN locations l on l.id = w.location_id
                                INNER JOIN {water_defs['body']}s b on b.location_id = l.id
@@ -249,7 +249,36 @@ def get_sw_weather_data(station, from_date=None, to_date=None, columns=None, rei
         Weather data for selected station indexed by date.
 
     """
-    return get_weather_data('surface', station, from_date, to_date, columns, reindex)
+    sw_columns = columns if columns and len(columns) else [
+        'day_time',
+        'precipitation',
+        'snow_accumulation',
+        'temperature_avg',
+        'temperature_min',
+        'temperature_max',
+        'cloud_cover_avg',
+        'cloud_cover_min',
+        'cloud_cover_max',
+        'dew_point_avg', 
+        'dew_point_min', 
+        'dew_point_max',
+        'humidity_avg',
+        'humidity_min',
+        'humidity_max',
+        'pressure_avg', 
+        'pressure_min', 
+        'pressure_max',
+        'uv_index_avg', 
+        'uv_index_min', 
+        'uv_index_max',
+        'precipitation_probability_avg',
+        'precipitation_probability_min',
+        'precipitation_probability_max',
+        'precipitation_intensity_avg',
+        'precipitation_intensity_min',
+        'precipitation_intensity_max'
+    ]
+    return get_weather_data('surface', station, from_date, to_date, sw_columns, reindex)
 
 
 def get_gw_weather_data(station, from_date=None, to_date=None, columns=None, reindex=True):
@@ -278,7 +307,17 @@ def get_gw_weather_data(station, from_date=None, to_date=None, columns=None, rei
         Weather data for selected station indexed by date.
 
     """
-    return get_weather_data('ground', station, from_date, to_date, columns, reindex)
+    gw_columns = columns if columns and len(columns) else [
+        'sun_duration',
+        'cloud_cover_avg',
+        'precipitation',
+        'snow_accumulation',
+        'snow_depth',
+        'temperature_avg',
+        'temperature_min',
+        'temperature_max'
+    ]
+    return get_weather_data('ground', station, from_date, to_date, gw_columns, reindex)
 
 
 def filter_stations(archive, from_date, to_date, threshold):
